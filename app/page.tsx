@@ -5,15 +5,29 @@ import { searchExaContents } from "./actions/exa-actions";
 import { getChatCompletion } from "./actions/openai-actions";
 import ReactMarkdown from "react-markdown";
 
+interface SearchResult {
+  url: string;
+  title: string;
+  snippet: string;
+  score: number;
+  publishedDate?: string;
+}
+
+interface SearchResponse {
+  results: SearchResult[];
+}
+
 interface SavedSearch {
   query: string;
-  results: any;
+  results: SearchResponse;
   summary: string;
 }
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<any>(null);
+  const [searchResults, setSearchResults] = useState<SearchResponse | null>(
+    null
+  );
   const [summary, setSummary] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -35,18 +49,16 @@ export default function Home() {
     setIsLoading(true);
     setSearchResults(null);
     setSummary(null);
-    setIsSaved(false); // Reset the isSaved state for new searches
+    setIsSaved(false);
     try {
-      const results = await searchExaContents(searchQuery);
-      setSearchResults(results);
+      const searchResults = await searchExaContents(searchQuery);
+      setSearchResults(searchResults as unknown as SearchResponse);
 
-      const topResults = results.results
-        .sort((a: any, b: any) => b.score - a.score)
+      const topResults = searchResults.results
+        .sort((a, b) => (b.score ?? 0) - (a.score ?? 0))
         .slice(0, 5);
 
-      const combinedText = topResults
-        .map((result: any) => result.text)
-        .join("\n\n");
+      const combinedText = topResults.map((result) => result.text).join("\n\n");
 
       const summaryPrompt = `
         The user asked the following question: "${searchQuery}"
@@ -243,33 +255,35 @@ export default function Home() {
                   </span>
                 </h2>
                 <div className="flex overflow-x-auto pb-4 gap-3">
-                  {searchResults.results.map((result: any, index: number) => {
-                    const siteUrl = new URL(result.url);
-                    const siteName = siteUrl.hostname.replace("www.", "");
-                    const publishedDate = result.publishedDate
-                      ? new Date(result.publishedDate).toLocaleDateString()
-                      : "Date not available";
+                  {searchResults.results.map(
+                    (result: SearchResult, index: number) => {
+                      const siteUrl = new URL(result.url);
+                      const siteName = siteUrl.hostname.replace("www.", "");
+                      const publishedDate = result.publishedDate
+                        ? new Date(result.publishedDate).toLocaleDateString()
+                        : "Date not available";
 
-                    return (
-                      <a
-                        key={index}
-                        href={result.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-blue-300"
-                      >
-                        <h3 className="font-bold mb-1 text-base text-blue-600 hover:text-blue-800 transition-colors duration-200 line-clamp-2">
-                          {result.title}
-                        </h3>
-                        <p className="text-xs text-gray-500 mb-1">
-                          {siteName} • {publishedDate}
-                        </p>
-                        <p className="text-xs text-gray-600 mb-2 line-clamp-3">
-                          {result.snippet}
-                        </p>
-                      </a>
-                    );
-                  })}
+                      return (
+                        <a
+                          key={index}
+                          href={result.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-blue-300"
+                        >
+                          <h3 className="font-bold mb-1 text-base text-blue-600 hover:text-blue-800 transition-colors duration-200 line-clamp-2">
+                            {result.title}
+                          </h3>
+                          <p className="text-xs text-gray-500 mb-1">
+                            {siteName} • {publishedDate}
+                          </p>
+                          <p className="text-xs text-gray-600 mb-2 line-clamp-3">
+                            {result.snippet}
+                          </p>
+                        </a>
+                      );
+                    }
+                  )}
                 </div>
               </div>
             )}
