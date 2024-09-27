@@ -345,40 +345,40 @@ export default function Home() {
                   <div className="space-y-6">
                     <ReactMarkdown
                       components={{
-                        h1: ({ node, ...props }) => (
+                        h1: ({ ...props }) => (
                           <h3
                             className="text-xl font-semibold mb-2 text-blue-700"
                             {...props}
                           />
                         ),
-                        h2: ({ node, ...props }) => (
+                        h2: ({ ...props }) => (
                           <h4
                             className="text-lg font-semibold mb-2 text-blue-600"
                             {...props}
                           />
                         ),
-                        p: ({ node, ...props }) => (
+                        p: ({ ...props }) => (
                           <p
                             className="mb-2 text-gray-700 leading-relaxed"
                             {...props}
                           />
                         ),
-                        strong: ({ node, ...props }) => (
+                        strong: ({ ...props }) => (
                           <strong
                             className="font-bold text-gray-900"
                             {...props}
                           />
                         ),
-                        em: ({ node, ...props }) => (
+                        em: ({ ...props }) => (
                           <em className="italic text-gray-800" {...props} />
                         ),
-                        ul: ({ node, ...props }) => (
+                        ul: ({ ...props }) => (
                           <ul className="list-disc pl-5 mb-2" {...props} />
                         ),
-                        ol: ({ node, ...props }) => (
+                        ol: ({ ...props }) => (
                           <ol className="list-decimal pl-5 mb-2" {...props} />
                         ),
-                        li: ({ node, ...props }) => (
+                        li: ({ ...props }) => (
                           <li className="mb-1" {...props} />
                         ),
                       }}
