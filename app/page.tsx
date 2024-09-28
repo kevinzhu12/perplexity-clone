@@ -229,7 +229,7 @@ export default function Home() {
                 Perplexi<span className="text-gray-800">Clone</span>
               </h1>
               <p className="text-lg sm:text-xl text-black font-light">
-                AI-Powered Search and Summarization
+                AI-Powered Search using Exa AI and OpenAI
               </p>
             </div>
 
