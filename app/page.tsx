@@ -78,7 +78,11 @@ export default function Home() {
         - Ensure that your summary is focused on answering the user's original question.
       `;
       const summaryResult = await getChatCompletion(summaryPrompt);
-      setSummary(summaryResult.content);
+      if ("content" in summaryResult) {
+        setSummary(summaryResult.content);
+      } else {
+        console.error("Error generating summary:", summaryResult.error);
+      }
     } catch (error) {
       console.error("Error performing search or generating summary:", error);
     } finally {
@@ -126,17 +130,17 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen font-sans bg-gradient-to-br from-purple-100 via-blue-100 to-green-100 flex">
+    <div className="min-h-screen font-sans bg-gradient-to-br from-[#acb6e5] to-[#86fde8] flex flex-col lg:flex-row">
       {/* Sidebar and toggle button container */}
-      <div className="relative">
+      <div className="relative lg:flex-shrink-0">
         {/* Sidebar */}
         <div
-          className={`fixed inset-y-0 left-0 w-72 bg-white shadow-lg transform ${
+          className={`fixed inset-y-0 left-0 w-full sm:w-80 lg:w-72 bg-white shadow-lg transform ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           } transition-transform duration-300 ease-in-out z-20 overflow-y-auto`}
         >
           <div className="p-6">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800 border-b pb-2">
+            <h2 className="text-2xl font-bold mb-6 text-black border-b pb-2">
               Saved Searches
             </h2>
             {savedSearches.map((savedSearch, index) => (
@@ -148,7 +152,7 @@ export default function Home() {
                   className="cursor-pointer p-4"
                   onClick={() => loadSavedSearch(savedSearch)}
                 >
-                  <p className="font-semibold text-gray-800 mb-1 pr-8">
+                  <p className="font-semibold text-[#2d3748] mb-1 pr-8">
                     {savedSearch.query}
                   </p>
                 </div>
@@ -157,7 +161,7 @@ export default function Home() {
                   onClick={() => setShowDeleteConfirm(index)}
                 >
                   <svg
-                    className="w-5 h-5 text-gray-500 hover:text-red-500"
+                    className="w-5 h-5 text-[#2d3748] hover:text-red-500"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -165,22 +169,19 @@ export default function Home() {
                   </svg>
                 </button>
                 {showDeleteConfirm === index && (
-                  <div className="absolute right-0 top-0 mt-8 w-48 bg-white rounded-md shadow-lg z-10 p-2">
-                    <p className="text-sm mb-2">Delete this saved search?</p>
-                    <div className="flex justify-end space-x-2">
-                      <button
-                        className="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
-                        onClick={() => deleteSavedSearch(index)}
-                      >
-                        Delete
-                      </button>
-                      <button
-                        className="px-3 py-1 text-xs bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition-colors duration-200"
-                        onClick={() => setShowDeleteConfirm(null)}
-                      >
-                        Cancel
-                      </button>
-                    </div>
+                  <div className="absolute right-0 top-0 mt-8 w-32 bg-white rounded-md shadow-lg z-10 p-2 flex flex-col space-y-1">
+                    <button
+                      className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors duration-200"
+                      onClick={() => deleteSavedSearch(index)}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      className="px-2 py-1 text-xs bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition-colors duration-200"
+                      onClick={() => setShowDeleteConfirm(null)}
+                    >
+                      Cancel
+                    </button>
                   </div>
                 )}
               </div>
@@ -190,8 +191,10 @@ export default function Home() {
 
         {/* Sidebar toggle button */}
         <button
-          className={`fixed top-4 z-30 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-lg transition-all duration-300 ease-in-out flex items-center space-x-2 ${
-            isSidebarOpen ? "left-[304px]" : "left-4"
+          className={`fixed top-4 z-30 bg-black hover:bg-gray-800 text-white px-4 py-2 rounded-md shadow-lg transition-all duration-300 ease-in-out flex items-center space-x-2 ${
+            isSidebarOpen
+              ? "left-[320px] sm:left-[336px] lg:left-[304px]"
+              : "left-4"
           }`}
           onClick={() => setIsSidebarOpen(!isSidebarOpen)}
         >
@@ -210,37 +213,40 @@ export default function Home() {
       </div>
 
       {/* Main content wrapper */}
-      <div className="flex-1 transition-all duration-300 ease-in-out flex justify-center">
+      <div className="flex-1 transition-all duration-300 ease-in-out flex justify-center p-4 sm:p-6 lg:p-8">
         {/* Content container */}
         <div
           className={`w-full max-w-4xl transition-all duration-300 ease-in-out ${
-            isSidebarOpen ? "ml-64" : ""
+            isSidebarOpen ? "lg:ml-72" : ""
           }`}
         >
-          <main className="p-8">
-            <div className="mb-12 text-center">
+          <main>
+            <div className="mb-8 sm:mb-12 text-center">
               <h1
-                className="text-6xl font-extrabold text-blue-600 mb-2 tracking-tight cursor-pointer"
+                className="text-4xl sm:text-5xl lg:text-6xl font-extrabold mb-2 tracking-tight cursor-pointer text-black"
                 onClick={resetToInitialState}
               >
-                Perplexi<span className="text-purple-600">Clone</span>
+                Perplexi<span className="text-gray-800">Clone</span>
               </h1>
-              <p className="text-xl text-gray-600 font-light">
+              <p className="text-lg sm:text-xl text-black font-light">
                 AI-Powered Search and Summarization
               </p>
             </div>
 
-            <form onSubmit={handleSearch} className="flex gap-2 mb-8">
+            <form
+              onSubmit={handleSearch}
+              className="flex flex-col sm:flex-row gap-2 mb-8"
+            >
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search for anything..."
-                className="flex-grow px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+                className="flex-grow px-4 py-3 border border-black rounded-md focus:outline-none focus:ring-2 focus:ring-black shadow-sm text-black placeholder-gray-400 bg-white"
               />
               <button
                 type="submit"
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-md hover:from-blue-600 hover:to-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all duration-200 shadow-md"
+                className="px-6 py-3 bg-black text-white rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-black transition-all duration-200 shadow-md"
                 disabled={isLoading}
               >
                 {isLoading ? "Searching..." : "Search"}
@@ -248,13 +254,11 @@ export default function Home() {
             </form>
 
             {searchResults && (
-              <div className="mb-12">
-                <h2 className="text-3xl font-bold mb-6 text-gray-800 border-b pb-2 border-gray-300">
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
-                    Sources
-                  </span>
+              <div className="mb-8 sm:mb-12">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 text-black border-b pb-2 border-gray-300">
+                  Sources
                 </h2>
-                <div className="flex overflow-x-auto pb-4 gap-3">
+                <div className="flex flex-col sm:flex-row sm:overflow-x-auto pb-4 gap-3">
                   {searchResults.results.map(
                     (result: SearchResult, index: number) => {
                       const siteUrl = new URL(result.url);
@@ -269,15 +273,15 @@ export default function Home() {
                           href={result.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex-shrink-0 w-72 bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border border-gray-200 hover:border-blue-300"
+                          className="flex-shrink-0 w-full sm:w-72 bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 border border-[#4a5568] hover:border-[#2d3748] mb-3 sm:mb-0"
                         >
-                          <h3 className="font-bold mb-1 text-base text-blue-600 hover:text-blue-800 transition-colors duration-200 line-clamp-2">
+                          <h3 className="font-bold mb-1 text-base text-[#2d3748] hover:text-[#4a5568] transition-colors duration-200 line-clamp-2">
                             {result.title}
                           </h3>
-                          <p className="text-xs text-gray-500 mb-1">
+                          <p className="text-xs text-[#4a5568] mb-1">
                             {siteName} • {publishedDate}
                           </p>
-                          <p className="text-xs text-gray-600 mb-2 line-clamp-3">
+                          <p className="text-xs text-[#718096] mb-2 line-clamp-3">
                             {result.snippet}
                           </p>
                         </a>
@@ -289,25 +293,23 @@ export default function Home() {
             )}
 
             {summary && (
-              <div className="mb-12">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-3xl font-bold text-gray-800 border-b pb-2 border-gray-300">
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
-                      Answer
-                    </span>
+              <div className="mb-8 sm:mb-12">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-black border-b pb-2 border-gray-300 mb-2 sm:mb-0">
+                    Answer
                   </h2>
                   <button
                     onClick={saveSearch}
                     disabled={isSaved}
                     className={`
-                      relative overflow-hidden px-6 py-2 rounded-md
+                      relative overflow-hidden px-4 sm:px-6 py-2 rounded-md
                       transition-all duration-300 ease-in-out
                       ${
                         isSaved
                           ? "bg-green-500 text-white cursor-default transform scale-105"
-                          : "bg-blue-500 text-white hover:bg-blue-600"
+                          : "bg-black text-white hover:bg-gray-800"
                       }
-                      focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-md
+                      focus:outline-none focus:ring-2 focus:ring-black shadow-md
                       min-w-[100px] transform
                     `}
                   >
@@ -341,45 +343,48 @@ export default function Home() {
                     </span>
                   </button>
                 </div>
-                <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200">
-                  <div className="space-y-6">
+                <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg border border-gray-300">
+                  <div className="space-y-4 sm:space-y-6">
                     <ReactMarkdown
                       components={{
                         h1: ({ ...props }) => (
                           <h3
-                            className="text-xl font-semibold mb-2 text-blue-700"
+                            className="text-lg sm:text-xl font-semibold mb-2 text-black"
                             {...props}
                           />
                         ),
                         h2: ({ ...props }) => (
                           <h4
-                            className="text-lg font-semibold mb-2 text-blue-600"
+                            className="text-base sm:text-lg font-semibold mb-2 text-black"
                             {...props}
                           />
                         ),
                         p: ({ ...props }) => (
                           <p
-                            className="mb-2 text-gray-700 leading-relaxed"
+                            className="mb-2 text-sm sm:text-base text-gray-800 leading-relaxed"
                             {...props}
                           />
                         ),
                         strong: ({ ...props }) => (
-                          <strong
-                            className="font-bold text-gray-900"
-                            {...props}
-                          />
+                          <strong className="font-bold text-black" {...props} />
                         ),
                         em: ({ ...props }) => (
                           <em className="italic text-gray-800" {...props} />
                         ),
                         ul: ({ ...props }) => (
-                          <ul className="list-disc pl-5 mb-2" {...props} />
+                          <ul
+                            className="list-disc pl-5 mb-2 text-sm sm:text-base text-gray-800"
+                            {...props}
+                          />
                         ),
                         ol: ({ ...props }) => (
-                          <ol className="list-decimal pl-5 mb-2" {...props} />
+                          <ol
+                            className="list-decimal pl-5 mb-2 text-sm sm:text-base text-gray-800"
+                            {...props}
+                          />
                         ),
                         li: ({ ...props }) => (
-                          <li className="mb-1" {...props} />
+                          <li className="mb-1 text-gray-800" {...props} />
                         ),
                       }}
                     >
@@ -391,19 +396,19 @@ export default function Home() {
             )}
 
             {isLoading && (
-              <div className="flex justify-center items-center mt-8">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
+              <div className="flex justify-center items-center my-8">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-[#4a5568]"></div>
               </div>
             )}
 
-            <footer className="mt-12 text-center text-gray-600 text-sm">
+            <footer className="mt-8 sm:mt-12 text-center text-[#4a5568] text-xs sm:text-sm">
               <p>
                 Created by{" "}
                 <a
                   href="https://www.kevinbzhu.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 underline"
+                  className="text-[#2d3748] hover:text-[#4a5568] underline"
                 >
                   Kevin Zhu
                 </a>{" "}
@@ -415,7 +420,7 @@ export default function Home() {
                   href="https://x.com/mckaywrigley/status/1831429674582602198"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800 underline"
+                  className="text-[#2d3748] hover:text-[#4a5568] underline"
                 >
                   this Twitter post
                 </a>
